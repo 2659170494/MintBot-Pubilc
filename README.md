@@ -11,7 +11,7 @@ Python3+Go-Cqhttp
 
 #### 安装教程
 
-1.  需使用Python 3的PIP安装库:keyword，socket，json，requests，random，urllib，time，os，filetype，demjson，cmath，ffmpeg-python(V20220502以后,安装ffmpeg-python前请一定要看该库的官方Github站( https://github.com/kkroening/ffmpeg-python )，使用该库的"音乐搜索"功能请务必观看安装教程(该功能依赖该的是ffmpeg-python库,而不是ffmpeg或python-ffmpeg。如果您的python装有这两个库请卸载他们(不卸载会导致冲突)。使用该库请在自己的机器上安装ffmpeg))
+1.  需使用Python 3的PIP安装库:keyword，socket，json，requests，random，urllib，time，os，filetype，demjson，cmath，hashlib，base64，ffmpeg-python(V20220508以后,安装ffmpeg-python前请一定要看该库的官方Github站( https://github.com/kkroening/ffmpeg-python )，使用该库的"音乐搜索"功能请务必观看安装教程(该功能依赖该的是ffmpeg-python库,而不是ffmpeg或python-ffmpeg。如果您的python装有这两个库请卸载他们(不卸载会导致冲突)。使用该库请在自己的机器上安装ffmpeg))
 2.  在https://go-cqhttp.org 下载Go-Cqhttp并登陆帐号，在config.yml中设置反向HTTP POST的Url为你使用MintBot的服务器和py文件中设置的反向Post端口
 3.  在项目的QQBot.py中修改对应配置
 4.  测试完成后即可使用(可根据自己需求修改文件)

@@ -1,4 +1,5 @@
 # -*- coding: UTF-8 -*-import receive
+import base64
 import socket
 import json
 import requests
@@ -9,6 +10,7 @@ import os
 import filetype
 import demjson
 import ffmpeg
+import hashlib
 from ast import Continue
 from cmath import exp
 from keyword import kwlist
@@ -18,18 +20,22 @@ adminQQ = [''] #管理员QQ列表
 superadmin = '' #超级管理员(机主)
 weatherKEY = '' #和风天气WebAPI的KEY
 onemingKey = '' #一铭API(https://api.wer.plus/)密钥
+#furauthKey = '' #绒狸开源机器人KEY,若没有请联系官方获取(密钥仅V2需使用，V1不受影响)
+furauthKey = '' #绒狸开源机器人KEY,若没有请联系官方获取(密钥仅V2需使用，V1不受影响)
 ZlibUserEmail = '' #服务器出现问题(或者说被墙了)，暂时停止维护
 ZlibPassword = '' #服务器出现问题(或者说被墙了)，暂时停止维护
 cqhttpserverip = '127.0.0.1' #CQ-Http服务器地址(Go-Cqhttp)
 cqhttpserveriphost = 5700 #CQ-Http服务器地址端口(Go-Cqhttp)
 cqhttpposthost = 1317 #CQ-Http服务器反向Post端口
 cqhttpaccesstoken = '' #连接CQ-Http服务器用的access_token，没有则留空
-MintBotVersion = 'MintBot V20220507' #机器人版本号
+MintBotVersion = 'MintBot V20220508' #机器人版本号
 BotName = '薄荷本兽' #机器人名字
 ZlibraryURL = 'zh.book4you.org' #服务器可以链接到Zlibrary的地址(无须加 http:// 或 https:// )(检查可用链接请访问:https://zh.1lib.domains/?redirectUrl=/) #服务器出现问题(或者说被墙了)，暂时停止维护
 menulist = [BotName+',找找(名字) ---在涂鸦宇宙中查找小伙伴',BotName+',今日早报 ---查看今日的60秒早报',BotName+',来只毛 ---随机在绒狸API获取一张毛图片',BotName+',(城市)天气 ---在和风天气查找对应城市的实时天气',BotName+',(音乐平台)搜歌(歌名) ---在音乐搜索器API搜索歌曲(若不知道支持平台可以把平台名字留空后发送查看)',BotName+'丢(/赞/爬/摸摸)(QQ号) ---发送自定义表情',BotName+',摸鱼日历 ---调用韩小韩API获取今日摸鱼日历',] #机器人目前支持的功能
 pokelist = [' 嗷呜OwO',' 呜呜不要再戳了QwQ',' 哇啊好痛QAQ',' awa',' 喵呜OwO',' ~~'] #机器人被戳一戳后会随机发送的消息
 songlist = ['网易云','QQ音乐','酷狗','酷我','千千','一听','咪咕','荔枝','蜻蜓','喜马拉雅','5sing原创','5sing翻唱','全民K歌'] #目前音乐搜索器支持的音乐平台
+privateblacklist = [] #私聊黑名单
+groupblacklist = [] #群聊黑名单
 #上面是一些配置
 ListenSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ListenSocket.bind((str(cqhttpserverip), int(cqhttpposthost)))
@@ -57,6 +63,8 @@ print('CQ-HTTP服务端反向Post端口：'+str(cqhttpposthost))
 print('CQ-HTTP服务端access_token：' + str(cqhttpaccesstoken))
 print('机器人名字：'+BotName)
 print('机器人版本：'+MintBotVersion)
+print('私聊黑名单:'+str(privateblacklist))
+print('群聊黑名单:'+str(groupblacklist))
 print('配置加载完成，若信息错误请自己修改配置信息。')
 def request_to_json(msg):
     for i in range(len(msg)):
@@ -297,9 +305,43 @@ def sea_mp3(songpagefun):
         print(songjson.get("error"))
         send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(searchsongQQ)+"][CQ:face,id=9]呜呜,出错了QAQ："+str(songjson.get("error"))+str('\n')+"-------------------"+str('\n')+MintBotVersion})
         return songjson.get("code")
+def furbotbuildSignString(apiPath,timestamp,authKey):
+    #timestamp = int(time.time())
+    furoriginal = int(str(apiPath)+'-'+str(timestamp)+'-'+str(authKey))
+    print(furoriginal)
+    furhash = int(hashlib.md5())
+    print(furhash)
+    #furoriginal = bytearray(furoriginal)
+    #furhash.update(furoriginal.encode("utf-8"))
+    #base64data=base64.b64encode(furhash.digest()).decode('utf-8')
+    #funbyte = int(bytes("".join(map(str,furhash.digest(bytearray(furoriginal))))), base=16)
+    funbytearray = bytearray(furoriginal, 'utf-8')
+    print(funbytearray)
+    furhash.update(funbytearray)
+    funhashdigest = furhash.digest()
+    print(funhashdigest)
+    funbytes = bytes(funhashdigest)
+    print(funbytes)
+    #fun16byte = int(str(funbytes),base=16)
+    #fun16byte = hex(ord(funbytes))
+    fun16byte = hex(funbytes)
+    print(fun16byte)
+    if fun16byte == '' or fun16byte == 'null':
+        if len(fun16byte) > 1:
+            funreturn =int(bytes("".join(map(fun16byte))))
+            print(funreturn)
+        else:
+            funreturn = int(bytes("".join(map('0' + str(fun16byte)))))
+            print(funreturn)
+    else:
+        funreturn =int(bytes("".join(map(fun16byte))))
+        print(funreturn)
+    #funreturn = funbyte
+    return funreturn
+    
 print('接受端口为'+str(cqhttpposthost)+'，请自行在Bot服务端中设置反向HTTP POST地址。')
 Zliblogin = 0
-print('加载完毕`，欢迎使用MintBot!')
+print('加载完毕，欢迎使用MintBot!')
 while True:
     try:
         rev = rev_msg()
@@ -340,6 +382,14 @@ while True:
                     wmsucessful =1
                 #print('消息为群消息类')
                 print('消息为群聊和私聊消息类')
+                if qq in privateblacklist or qq in groupblacklist or sendid in privateblacklist or sendid in groupblacklist:
+                    try:
+                        send_msg({'msg_type':'private','number':int(superadmin),'msg':'收到来自'+str(sendid)+'(在黑名单内)的'+str(messagetype)+'消息：'+str(message)})
+                        Continue
+                    except BaseException as error:
+                        send_msg({'msg_type':'private','number':int(superadmin),'msg':'收到'+str(messagetype)+'消息但发送了错误QAQ：'+str(error)})
+                        Continue
+                    message = ""
                 if "[CQ:at,qq="+QQID+"]" in message:
                     if rev['raw_message'][len(rev['raw_message'])-2:len(rev['raw_message'])]=='在吗':
                         send_msg({'msg_type':str(messagetype),'number':sendid,'msg':'[CQ:poke,qq={}]'.format(qq)})
@@ -401,20 +451,24 @@ while True:
                         else:
                             send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:face,id=9]呜呜,失败了qwq:("+sixtysjson.get("code")+"):"+sixtysjson.get("msg")+str('\n')+"-------------------"+str('\n')+MintBotVersion})
                     elif  messagecommand[0:3] == "来只毛":
-                        microtailurl = 'https://api.tail.icu/api/v1/getFursuit/json'
-                        microtailrequests = requests.get(microtailurl).text
-                        microtailjson = json.loads(microtailrequests)
-                        if microtailjson.get("code") == 200:
-                            send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:face,id=12]嗷呜！有请毛毛："+str(microtailjson.get("data").get("name"))+"（ID："+str(microtailjson.get("data").get("id"))+"）"+str("\n")+"内容来自：绒狸MicroTail"+str('\n')+"-------------------"+str('\n')+MintBotVersion})
-                            os.chdir(r"C:\\Users\Administrator\.go-cqhttp")
-                            microtailimg = requests.get(microtailjson.get('data').get("url"))
-                            microtailfiletype = filetype.guess(microtailimg.content)
-                            print(microtailimg)
-                            with open(os.getcwd()+"\microtailtmp."+microtailfiletype.extension,'wb') as f:
-                                f.write(microtailimg.content)
-                            send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:image,file=file:///"+os.getcwd()+"\microtailtmp."+microtailfiletype.extension+"]"})
+                        microtailurl = 'https://api.tail.icu/'
+                        if furauthKey == '':
+                            microtailurl = microtailurl+'api/v1/getFursuit/json'
+                            microtailrequests = requests.get(microtailurl).text
+                            microtailjson = json.loads(microtailrequests)
+                            if microtailjson.get("code") == 200:
+                                send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:face,id=12]嗷呜！有请毛毛："+str(microtailjson.get("data").get("name"))+"（ID："+str(microtailjson.get("data").get("id"))+"）"+str("\n")+"内容来自：绒狸MicroTail"+str('\n')+"-------------------"+str('\n')+MintBotVersion})
+                                os.chdir(r"C:\\Users\Administrator\.go-cqhttp")
+                                microtailimg = requests.get(microtailjson.get('data').get("url"))
+                                microtailfiletype = filetype.guess(microtailimg.content)
+                                print(microtailimg)
+                                with open(os.getcwd()+"\microtailtmp."+microtailfiletype.extension,'wb') as f:
+                                    f.write(microtailimg.content)
+                                send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:image,file=file:///"+os.getcwd()+"\microtailtmp."+microtailfiletype.extension+"]"})
+                            else:
+                                send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:face,id=9]呜呜,失败了qwq:("+microtailjson.get("code")+")："+microtailjson.get("msg")+str('\n')+"-------------------"+str('\n')+MintBotVersion})
                         else:
-                            send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:face,id=9]呜呜,失败了qwq:("+microtailjson.get("code")+")："+microtailjson.get("msg")+str('\n')+"-------------------"+str('\n')+MintBotVersion})
+                            Continue
                     #elif message[0:8] == "涂鸦宇宙，来只毛" or message[0:8] == "涂鸦宇宙,来只毛" :
                         #if 14<=int(time.strftime("%H"))<=16:
                             #continue
@@ -902,7 +956,8 @@ while True:
                         elif 'CQ:at' in messagecommand:
                             MoId = messagecommand[messagecommand.rfind('=')+1:messagecommand.rfind(']')]
                         else:
-                            MoId = messagecommand[2:len(messagecommand)]
+                            MoId = messagecommand[1 :len(messagecommand)]
+                        print(MoId)
                         DiuApiUrl = 'http://api.weijieyue.cn/api/tupian/diu.php?qq='+str(MoId)
                         os.chdir(r"C:\\Users\Administrator\.go-cqhttp")
                         Diufile = requests.get(DiuApiUrl)
@@ -916,7 +971,8 @@ while True:
                         elif 'CQ:at' in messagecommand:
                             MoId = messagecommand[messagecommand.rfind('=')+1:messagecommand.rfind(']')]
                         else:
-                            MoId = messagecommand[2:len(messagecommand)]
+                            MoId = messagecommand[1:len(messagecommand)]
+                        print(MoId)
                         ZanApiUrl = 'http://api.weijieyue.cn/api/tupian/zan.php?qq='+str(MoId)
                         os.chdir(r"C:\\Users\Administrator\.go-cqhttp")
                         Zanfile = requests.get(ZanApiUrl)
@@ -930,7 +986,8 @@ while True:
                         elif 'CQ:at' in messagecommand:
                             MoId = messagecommand[messagecommand.rfind('=')+1:messagecommand.rfind(']')]
                         else:
-                            MoId = messagecommand[2:len(messagecommand)]
+                            MoId = messagecommand[1:len(messagecommand)]
+                        print(MoId)
                         PaApiUrl = 'http://api.weijieyue.cn/api/tupian/pa.php?qq='+str(MoId)
                         os.chdir(r"C:\\Users\Administrator\.go-cqhttp")
                         Pafile = requests.get(PaApiUrl)
@@ -945,6 +1002,7 @@ while True:
                             MoId = messagecommand[messagecommand.rfind('=')+1:messagecommand.rfind(']')]
                         else:
                             MoId = messagecommand[2:len(messagecommand)]
+                        print(MoId)
                         MoApiQQimageUrl = 'http://api.btstu.cn/qqxt/api.php?qq='+str(MoId)
                         os.chdir(r"C:\\Users\Administrator\.go-cqhttp")
                         MoQQimagegetJson = demjson.decode(requests.get(MoApiQQimageUrl).text)
@@ -970,6 +1028,13 @@ while True:
                         with open(os.getcwd()+"\MoYuimage."+MoYuFileType,'wb') as f:
                             f.write(MoYuFile.content)
                         send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:face,id=12]摸鱼时间~~"+str("\n")+"[CQ:image,file=file:///"+os.getcwd()+"\MoYuimage."+MoYuFileType+"]"})
+                    #elif messagecommand[0:2] == '测试':
+                        #fururldata = {'qq':'2659170494','sign':furbotbuildSignString('api/v2/getFursuitRand',int(time.time()),'a4WpGePYVzMc6gSa'),'timestamp':int(time.time())}
+                        #print(fururldata)
+                        #send_msg({'msg_type':str(messagetype),'number':sendid,'msg':str(fururldata)})
+                        #furget = requests.get("https://api.tail.icu/api/v2/getFursuitRand",data=fururldata).text
+                        #print(furget)
+                        #send_msg({'msg_type':str(messagetype),'number':sendid,'msg':str(furget)})
                     else:
                         send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:face,id=9]呜呜，咱不知道您说的指令QWQ。不妨说'薄荷本兽，菜单'看看我能做什么呗？"+str('\n')+"-------------------"+str('\n')+MintBotVersion})    
                 #if message == "涂鸦宇宙":
@@ -992,9 +1057,9 @@ while True:
                     menumessage = menumessage + str("\n")+"-------------------"+str("\n")+MintBotVersion
                     send_msg({'msg_type':str(messagetype),'number':sendid,'msg':menumessage})
                     
-#        except BaseException as error:
-#                   print('所有异常的基类：'+str(error))
-#                   continue
+        except BaseException as error:
+                   print('所有异常的基类：'+str(error))
+                   continue
         except SystemExit as error:
                    print('解释器请求退出：'+str(error))
                    continue
@@ -1088,12 +1153,12 @@ while True:
         except SystemError as error:
                    print('一般的解释器系统错误：'+str(error))
                    continue
-        except TypeError as error:
-                   print('对类型无效的操作：'+str(error))
-                   continue
-        except ValueError as error:
-                   print('传入无效的参数：'+str(error))
-                   continue
+#        except TypeError as error:
+#                   print('对类型无效的操作：'+str(error))
+#                   continue
+#        except ValueError as error:
+#                   print('传入无效的参数：'+str(error))
+#                   continue
         except UnicodeError as error:
                    print('Unicode 相关的错误：'+str(error))
                    continue
