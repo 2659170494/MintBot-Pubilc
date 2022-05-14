@@ -1,6 +1,6 @@
 # MintBot
 
-本代码因无法连接至Github(" https://github.com/2659170494/MintBot ")默认在Gitee(" https://gitee.com/GreenYoshi/MintBot ")更新,Github(" https://github.com/2659170494/MintBot ")上的代码能否更新完全看运气!!!
+本代码因无法连接至Github(" https://github.com/2659170494/MintBot-Public ")默认在Gitee(" https://gitee.com/GreenYoshi233/MintBot-Public ")更新,Github(" https://github.com/2659170494/MintBot-Public ")上的代码能否更新完全看运气!!!
 
 #### 介绍
 MintBot---薄荷机器人,是一个作者个人边学习边实践Python的个人作品之一(一个功能较多的自制机器人,该版本为公开版本)
