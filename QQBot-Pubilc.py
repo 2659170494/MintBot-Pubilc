@@ -14,13 +14,51 @@ import hashlib
 from ast import Continue
 from cmath import exp
 from keyword import kwlist
+savelist=['QQID','adminQQ','superadmin','weatherKEY','onemingKey','furauthKey','ZlibUserEmail','ZlibPassword','privateblacklist','groupblacklist']  #需要存读的变量
+def save_save():  #保存存档
+	try:  #尝试执行代码
+		savefile = open(os.getcwd()+r'/botsave.txt', mode='w+')   #打开文件
+		#print(savefile)
+		globallist = globals()  #读取全局变量
+		#print(globallist)
+		savedict ={}  #预设需要保存的变量字典
+		#print(savedict)
+		for val in savelist:  #从需要要保存的变量的列表中读取出变量名到val变量直到读取完毕
+			#print(val)
+			savetempdict={val:globallist[val]} #设置缓存列表为(变量名:变量的内容)
+			#print(savetempdict)
+			savedict.update(savetempdict) #添加缓存列表数据到变量字典
+			#print(savedict)
+		savefile.write(json.dumps(savedict)) #将字典转换成json之后写入文件
+		#print(json.dumps(savedict))
+		savefile.close() #关闭文件
+		print('存档完毕')
+	except BaseException as error: #抓取try代码中所有错误的类型和原因给error并执行代码
+		print('发生错误QAQ:'+str(error))
+def save_read():  #读取存档
+    try:  #尝试执行代码
+        savefile = open(os.getcwd()+r'/botsave.txt', mode='r+')  #读取文件
+        savereaddata  =  json.loads(savefile.read()) #读取文件中的json并转换成字典
+        #print(savereaddata)
+        for val in savereaddata: #从字典中找出变量并赋值给val直至查找完毕
+            #print(val)
+            #print(evalcommand)
+            #print('global '+val+';'+val+'='+str(savereaddata[val]))
+            exec('global '+val+';'+val+'=str('+str(savereaddata[val])+')') #以全局模式调用代码(而不是在函数里调用代码)
+            savefile.close()   #关闭文件
+        #print( locals())
+        print('读档完毕')
+    except IOError: #捕获输入/出错误和原因给error并执行代码
+        print('没有存档文件QWQ')
+    except BaseException as error: #捕获所有错误和原因给error并执行代码
+        print('发生错误QAQ:'+str(error))
 #下面是一些配置。
 QQID="" #机器人的QQ号
 adminQQ = [''] #管理员QQ列表
 superadmin = '' #超级管理员(机主)
 weatherKEY = '' #和风天气WebAPI的KEY
 onemingKey = '' #一铭API(https://api.wer.plus/)密钥
-#furauthKey = '' #绒狸开源机器人KEY,若没有请联系官方获取(密钥仅V2需使用，V1不受影响)
+#furauthKey = 'a4WpGePYVzMc6gSa' #绒狸开源机器人KEY,若没有请联系官方获取(密钥仅V2需使用，V1不受影响)
 furauthKey = '' #绒狸开源机器人KEY,若没有请联系官方获取(密钥仅V2需使用，V1不受影响)
 ZlibUserEmail = '' #服务器出现问题(或者说被墙了)，暂时停止维护
 ZlibPassword = '' #服务器出现问题(或者说被墙了)，暂时停止维护
@@ -28,15 +66,24 @@ cqhttpserverip = '127.0.0.1' #CQ-Http服务器地址(Go-Cqhttp)
 cqhttpserveriphost = 5700 #CQ-Http服务器地址端口(Go-Cqhttp)
 cqhttpposthost = 1317 #CQ-Http服务器反向Post端口
 cqhttpaccesstoken = '' #连接CQ-Http服务器用的access_token，没有则留空
-MintBotVersion = 'MintBot V20220508' #机器人版本号
+MintBotVersion = 'MintBot V20220616' #机器人版本号
 BotName = '薄荷本兽' #机器人名字
-ZlibraryURL = 'zh.book4you.org' #服务器可以链接到Zlibrary的地址(无须加 http:// 或 https:// )(检查可用链接请访问:https://zh.1lib.domains/?redirectUrl=/) #服务器出现问题(或者说被墙了)，暂时停止维护
-menulist = [BotName+',找找(名字) ---在涂鸦宇宙中查找小伙伴',BotName+',今日早报 ---查看今日的60秒早报',BotName+',来只毛 ---随机在绒狸API获取一张毛图片',BotName+',(城市)天气 ---在和风天气查找对应城市的实时天气',BotName+',(音乐平台)搜歌(歌名) ---在音乐搜索器API搜索歌曲(若不知道支持平台可以把平台名字留空后发送查看)',BotName+'丢(/赞/爬/摸摸)(QQ号) ---发送自定义表情',BotName+',摸鱼日历 ---调用韩小韩API获取今日摸鱼日历',] #机器人目前支持的功能
+ZlibraryURL = 'zh.cn1lib.vip' #服务器可以链接到Zlibrary的地址(无须加 http:// 或 https:// )(检查可用链接请访问:https://zh.1lib.domains/?redirectUrl=/ 或 https://a.fuyeor.com/to-zlibrary) #服务器出现问题(或者说被墙了)，暂时停止维护
+#menulist = [BotName+',找找(名字) ---在涂鸦宇宙中查找小伙伴',BotName+',今日早报 ---查看今日的60秒早报',BotName+',来只毛 ---随机在绒狸API获取一张毛图片',BotName+',(城市)天气 ---在和风天气查找对应城市的实时天气',BotName+',(音乐平台)搜歌(歌名) ---在音乐搜索器API搜索歌曲(若不知道支持平台可以把平台名字留空后发送查看)',BotName+'丢(/赞/爬/摸摸)(QQ号) ---发送自定义表情',BotName+',摸鱼日历 ---调用韩小韩API获取今日摸鱼日历',] #机器人目前支持的功能
+menulist = [BotName+',找找(名字) ---在涂鸦宇宙中查找小伙伴',BotName+',今日早报 ---查看今日的60秒早报',BotName+',来只毛 ---随机在绒狸API获取一张毛图片',BotName+',(城市)天气 ---在和风天气查找对应城市的实时天气',BotName+',(音乐平台)搜歌(歌名) ---在音乐搜索器API搜索歌曲(若不知道支持平台可以把平台名字留空后发送查看)',BotName+'丢(/赞/爬/摸摸)(QQ号) ---发送自定义表情',] #机器人目前支持的功能
 pokelist = [' 嗷呜OwO',' 呜呜不要再戳了QwQ',' 哇啊好痛QAQ',' awa',' 喵呜OwO',' ~~'] #机器人被戳一戳后会随机发送的消息
 songlist = ['网易云','QQ音乐','酷狗','酷我','千千','一听','咪咕','荔枝','蜻蜓','喜马拉雅','5sing原创','5sing翻唱','全民K歌'] #目前音乐搜索器支持的音乐平台
 privateblacklist = [] #私聊黑名单
 groupblacklist = [] #群聊黑名单
 #上面是一些配置
+if os.path.exists(os.getcwd()+r'/botsave.txt')==True:
+    print('检测到存档文件，开始读档')
+    save_read()
+elif os.path.exists(os.getcwd()+r'/botsave.txt')==False:
+    print('存档不存在，开始自动创建')
+    save_save()
+else:
+    print('读取失败：出现错误')
 ListenSocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 ListenSocket.bind((str(cqhttpserverip), int(cqhttpposthost)))
 ListenSocket.listen(100)
@@ -50,7 +97,8 @@ Accept-Language: en-US,en;q=0.9
 Connection: close
 
 '''
-print('机器人QQ号:'+QQID)
+str(QQID)
+print('机器人QQ号:'+str(QQID))
 print('超级管理员QQ：'+str(superadmin))
 print('和风天气API的KEY：'+weatherKEY)
 print('一铭API密钥：'+str(onemingKey))
@@ -382,14 +430,6 @@ while True:
                     wmsucessful =1
                 #print('消息为群消息类')
                 print('消息为群聊和私聊消息类')
-                if qq in privateblacklist or qq in groupblacklist or sendid in privateblacklist or sendid in groupblacklist:
-                    try:
-                        send_msg({'msg_type':'private','number':int(superadmin),'msg':'收到来自'+str(sendid)+'(在黑名单内)的'+str(messagetype)+'消息：'+str(message)})
-                        Continue
-                    except BaseException as error:
-                        send_msg({'msg_type':'private','number':int(superadmin),'msg':'收到'+str(messagetype)+'消息但发送了错误QAQ：'+str(error)})
-                        Continue
-                    message = ""
                 if "[CQ:at,qq="+QQID+"]" in message:
                     if rev['raw_message'][len(rev['raw_message'])-2:len(rev['raw_message'])]=='在吗':
                         send_msg({'msg_type':str(messagetype),'number':sendid,'msg':'[CQ:poke,qq={}]'.format(qq)})
@@ -402,6 +442,86 @@ while True:
                     else:
                         messagecommand = message[len(BotName)+1:len(message)]
                     print(messagecommand)
+                    if str(qq) in privateblacklist or str(qq) in groupblacklist or str(sendid) in privateblacklist or str(sendid) in groupblacklist:
+                        try:
+                            send_msg({'msg_type':'private','number':int(superadmin),'msg':'收到来自'+str(sendid)+'(在黑名单内)的'+str(messagetype)+'消息：'+str(message)})
+                            continue
+                        except BaseException as error:
+                            send_msg({'msg_type':'private','number':int(superadmin),'msg':'收到'+str(messagetype)+'消息但发送了错误QAQ：'+str(error)})
+                            continue
+                        message = ""
+                        messagecommand = ""
+                    if messagecommand[0:5] == '加入黑名单':
+                        if sendid in adminQQ or sendid == superadmin:
+                            if '到人' in messagecommand or '到群' in messagecommand:
+                                if '群' in messagecommand:
+                                    groupblacklist.append(str(messagecommand[5:messagecommand.rfind('到')]))
+                                    save_save()
+                                    send_msg({'msg_type':str(messagetype),'number':sendid,'msg':'[CQ:at,qq='+int(sendid)+']添加成功awa'})
+                                elif '人' in messagecommand:
+                                    privateblacklist.append(str(messagecommand[5:messagecommand.rfind('到')]))
+                                    save_save()
+                                    send_msg({'msg_type':str(messagetype),'number':sendid,'msg':'[CQ:at,qq='+int(sendid)+']添加成功awa'})
+                            else:
+                                print('加入黑名单失败:没有找到对应关键词')
+                                send_msg({'msg_type':str(messagetype),'number':sendid,'msg':'[CQ:at,qq='+int(sendid)+']加入黑名单失败:没有找到关键词QwQ'})
+                        else:
+                            send_msg({'msg_type':str(messagetype),'number':sendid,'msg':'[CQ:at,qq='+int(sendid)+']你不是管理员QwQ'})
+                    if messagecommand[0:5] == '删除黑名单':
+                        if sendid in adminQQ or sendid == superadmin:
+                            if '到人' in messagecommand or '到群' in messagecommand:
+                                if '群' in messagecommand:
+                                    groupblacklist.remove(str(messagecommand[5:messagecommand.rfind('到')]))
+                                    save_save()
+                                    send_msg({'msg_type':str(messagetype),'number':sendid,'msg':'[CQ:at,qq='+int(sendid)+']添加成功awa'})
+                                elif '人' in messagecommand:
+                                    privateblacklist.remove(str(messagecommand[5:messagecommand.rfind('到')]))
+                                    save_save()
+                                    send_msg({'msg_type':str(messagetype),'number':sendid,'msg':'[CQ:at,qq='+int(sendid)+']添加成功awa'})
+                            else:
+                                print('删除黑名单失败:没有找到对应关键词')
+                                send_msg({'msg_type':str(messagetype),'number':sendid,'msg':'[CQ:at,qq='+int(sendid)+']加入黑名单失败:没有找到关键词QwQ'})
+                        else:
+                            send_msg({'msg_type':str(messagetype),'number':sendid,'msg':'[CQ:at,qq='+int(sendid)+']你不是管理员QwQ'})
+                    if messagecommand[0:4] == '发送消息':
+                        sendmessageidlist = []
+                        if str(qq) in adminQQ or str(qq) == superadmin :
+                            if '到' in messagecommand:
+                                if '群' in messagecommand:
+                                    try:
+                                        send_msg({'msg_type':'group','number':int(messagecommand[messagecommand.rfind('到')+1:messagecommand.rfind('群')]),'msg':str(messagecommand[4:messagecommand.rfind('到')])})
+                                    except BaseException as error:
+                                        send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(qq)+"][CQ:face,id=9]呜呜,出错了QAQ："+str(error)+str('\n')+"-------------------"+str('\n')+MintBotVersion})
+                                        print('所有异常的基类：'+str(error))
+                                        continue
+                                elif '人' in messagecommand:
+                                    try:
+                                        send_msg({'msg_type':'private','number':int(messagecommand[messagecommand.rfind('到')+1:messagecommand.rfind('人')]),'msg':str(messagecommand[4:messagecommand.rfind('到')])})
+                                    except BaseException as error:
+                                        send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(qq)+"][CQ:face,id=9]呜呜,出错了QAQ："+str(error)+str('\n')+"-------------------"+str('\n')+MintBotVersion})
+                                        print('所有异常的基类：'+str(error))
+                                        continue
+                                else:
+                                    try:
+                                        send_msg({'msg_type':str(messagetype),'number':sendid,'msg':str(messagecommand[4:len(messagecommand)])})
+                                    except BaseException as error:
+                                        send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(qq)+"][CQ:face,id=9]呜呜,出错了QAQ："+str(error)+str('\n')+"-------------------"+str('\n')+MintBotVersion})
+                                        print('所有异常的基类：'+str(error))
+                                        continue
+                            else:
+                                try:
+                                    send_msg({'msg_type':str(messagetype),'number':sendid,'msg':str(messagecommand[4:len(messagecommand)])})
+                                except BaseException as error:
+                                    send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(qq)+"][CQ:face,id=9]呜呜,出错了QAQ："+str(error)+str('\n')+"-------------------"+str('\n')+MintBotVersion})
+                                    print('所有异常的基类：'+str(error))
+                                    continue
+                        else:
+                            try:
+                                send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(qq)+"]您不是管理员QwQ"}) 
+                            except BaseException as error:
+                                send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(qq)+"][CQ:face,id=9]呜呜,出错了QAQ："+str(error)+str('\n')+"-------------------"+str('\n')+MintBotVersion})
+                                print('所有异常的基类：'+str(error))
+                                continue
                     if  messagecommand[0:2] == "找找":
                         findfriend = messagecommand[2:len(messagecommand)]
                         findfriendurl = 'https://duo-api.turka.cn/tuyafriends/?name='
@@ -602,10 +722,6 @@ while True:
                                                                             swlistlen=swlistlen+1
                                                                             messageRefresh = 0
                                                                             break
-                                                                    elif BotName in message:
-                                                                        send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:face,id=9]呜呜,目前服务被"+searchweatherQQ+"占用中qwq(任何人都可以回复'"+BotName+"，停止操作'中止执行人操作)"+str('\n')+"-------------------"+str('\n')+MintBotVersion})
-                                                                        messageRefresh = 0
-                                                                        continue
                                                                     #elif '涂鸦宇宙' in message:
                                                                         #if 14<=int(time.strftime("%H"))<=16:
                                                                             #messageRefresh = 0
@@ -620,12 +736,23 @@ while True:
                                                                         #send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(searchweatherQQ)+"][CQ:face,id=9]呜呜,指令已超时qwq"+str('\n')+"-------------------"+str('\n')+MintBotVersion})
                                                                         #wmsucessful = 1
                                                                         #break
-                                                                    elif message[0:len(BotName)+5] == BotName+"，停止操作" or message[0:9] == BotName+",停止操作":
-                                                                        swlistlen=swlistlen+1
-                                                                        print(str(searchweatherQQ)+"已中止")
-                                                                        send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(searchweatherQQ)+"][CQ:face,id=9]呜呜,指令已被终止qwq"+str('\n')+"-------------------"+str('\n')+MintBotVersion})
-                                                                        wmsucessful = 1
-                                                                        break
+                                                                    elif message[0:len(BotName)+5] == BotName+"，停止操作" or message[0:len(BotName)+5] == BotName+",停止操作":
+                                                                        try:
+                                                                            swlistlen=swlistlen+1
+                                                                            print(str(searchweatherQQ)+"已中止")
+                                                                            send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(searchweatherQQ)+"][CQ:face,id=9]呜呜,指令已被终止qwq"+str('\n')+"-------------------"+str('\n')+MintBotVersion})
+                                                                            wmsucessful = 1
+                                                                            break
+                                                                        except:
+                                                                            swlistlen=swlistlen+1
+                                                                            print(str(searchsongQQ)+"已中止")
+                                                                            send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"已终止操作qwq"})
+                                                                            wmsucessful = 1
+                                                                            break
+                                                                    elif BotName in message:
+                                                                        send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:face,id=9]呜呜,目前服务被"+searchweatherQQ+"占用中qwq(任何人都可以回复'"+BotName+"，停止操作'中止执行人操作)"+str('\n')+"-------------------"+str('\n')+MintBotVersion})
+                                                                        messageRefresh = 0
+                                                                        continue
                                                                     else:
                                                                         continue
                                             print('循环回复已结束')
@@ -650,7 +777,7 @@ while True:
                         Zlibheader = {'Host':str(ZlibraryURL),'source':'android','accept-encoding':'gzip','user-agent':'okhttp/3.12.13'}
                         if json.loads(requests.get('https://'+str(ZlibraryURL)+'/eapi/info/ok',headers=Zlibheader).text).get("success") == 1:
                             try:
-                                while Zliblogin != 0:
+                                while Zliblogin == 0:
                                     if Zliblogin == 0:
                                         Zlibloginurl = 'https://'+str(ZlibraryURL)+'/eapi/user/login'
                                         Zliblogindata = {'email':ZlibUserEmail,'password':ZlibPassword}
@@ -662,7 +789,7 @@ while True:
                                             Zliblogincookies = Zlibloginrequests.cookies
                                             print(Zliblogincookies)
                                             ZlibUser = Zlibloginjson.get('user')
-                                            print(ZlibUser)
+                                            print(ZlibUser) 
                                             ZlibUsername = ZlibUser.get('name')
                                             print(ZlibUsername)
                                             ZlibUserID = ZlibUser.get('id')
@@ -680,14 +807,23 @@ while True:
                                         break
                                 if Zliblogin == 1:
                                     booksearchurl = 'https://'+str(ZlibraryURL)+'/eapi/book/search'
-                                    booksearchdata = {"message":str(bookname),"languages"+"[]":"","extensions"+"[]":"","order":"popular"}
+                                    booknamehex = str(bookname).encode('utf-8').hex()
+                                    booksearchdata = {"message":bytes(bytearray.fromhex(booknamehex)).decode(encoding="unicode_escape").replace("b'","").replace("'",""),"languages"+"[]":"","extensions"+"[]":"","order":"popular"}
+                                    send_msg({'msg_type':str(messagetype),'number':sendid,'msg':str(booksearchdata)})
                                     print(json.dumps(booksearchdata))
                                     booksearchrequests = requests.post(booksearchurl,data=json.dumps(booksearchdata)).text
+                                    print(booksearchrequests)
                                     booksearchlistjson = json.loads(booksearchrequests).get("books")
                                     booksearchlist = []
                                     booksearchIDlist = []
                                     booksearchnamelist = []
-                                    print(bookname)
+                                    booksearchcoverlist = []
+                                    booksearchextensionlist = []
+                                    booksearchlanguagelist = []
+                                    booksearchauthorlist = []
+                                    booksearchhashlist = []
+                                    booksearchdescriptionlist = []
+                                    #print(bookname)
                                     for bsline in booksearchlistjson:
                                         booksearchlist.append(bsline)
                                         print(bsline)
@@ -695,14 +831,26 @@ while True:
                                         print(bsline.get("id"))
                                         booksearchnamelist.append(bsline.get("title"))
                                         print(bsline.get("title"))
+                                        booksearchcoverlist.append(bsline.get("cover"))
+                                        booksearchextensionlist.append(bsline.get("extension"))
+                                        booksearchlanguagelist.append(bsline.get("language"))
+                                        booksearchauthorlist.append(bsline.get("author"))
+                                        booksearchhashlist.append(bsline.get("hash"))
+                                        print(bsline.get("hash"))
+                                        booksearchdescriptionlist.append(bsline.get("description"))
+                                    send_msg({'msg_type':str(messagetype),'number':sendid,'msg':str(booksearchnamelist)})
+                                    send_msg({'msg_type':str(messagetype),'number':sendid,'msg':str(booksearchIDlist)})
+                                    send_msg({'msg_type':str(messagetype),'number':sendid,'msg':str(booksearchhashlist)})
                                 elif Zliblogin == 2:
                                     Zliblogin = 0
                                 else:
                                     print('登录失败：未知错误')
-                                    send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:face,id=9]呜呜,登录失败QAQ:未知错误"++str('\n')+"-------------------"+str('\n')+MintBotVersion})
+                                    send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:face,id=9]呜呜,登录失败QAQ:未知错误"+str('\n')+"-------------------"+str('\n')+MintBotVersion})
                                     Zliblogin = 0
-                            except:
-                                print('失败')
+                            except BaseException as error:
+                                print('失败了QAQ：'+str(error))
+                                send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:face,id=9]呜呜,失败QAQ:"+str(error)+str('\n')+"-------------------"+str('\n')+MintBotVersion})
+                                continue
                         else:
                             print('连接服务器失败')
                             send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:face,id=9]呜呜,无法链接到服务器QAQ"+str('\n')+"-------------------"+str('\n')+MintBotVersion})
@@ -880,16 +1028,23 @@ while True:
                                                             messagescucess = 1
                                                             messageRefresh = 0
                                                             break
+                                                    elif message[0:len(BotName)+5] == BotName+"，停止操作" or message[0:len(BotName)+5] == BotName+",停止操作":
+                                                        try:
+                                                            print(str(searchsongQQ)+"已中止")
+                                                            send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(searchsongQQ)+"][CQ:face,id=9]呜呜,指令已被终止qwq"+str('\n')+"-------------------"+str('\n')+MintBotVersion})
+                                                            messagescucess = 1
+                                                            messageRefresh = 0
+                                                            break
+                                                        except:
+                                                            print(str(searchsongQQ)+"已中止")
+                                                            send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"已终止操作qwq"})
+                                                            messagescucess = 1
+                                                            messageRefresh = 0
+                                                            break
                                                     elif BotName in message:
                                                         send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:face,id=9]呜呜,目前服务被"+searchsongQQ+"占用中qwq(任何人都可以回复'"+BotName+"，停止操作'中止执行人操作)"+str('\n')+"-------------------"+str('\n')+MintBotVersion})
                                                         messageRefresh = 0
                                                         continue
-                                                    elif message[0:len(BotName)+5] == BotName+"，停止操作" or message[0:9] == BotName+",停止操作":
-                                                        print(str(searchsongQQ)+"已中止")
-                                                        send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(searchsongQQ)+"][CQ:face,id=9]呜呜,指令已被终止qwq"+str('\n')+"-------------------"+str('\n')+MintBotVersion})
-                                                        messagescucess = 1
-                                                        messageRefresh = 0
-                                                        break
                                                     else:
                                                         continue
                                             else:
@@ -911,45 +1066,6 @@ while True:
                     elif '在吗' in messagecommand:
                         send_msg({'msg_type':str(messagetype),'number':sendid,'msg':'[CQ:poke,qq={}]'.format(qq)})
                         send_msg({'msg_type':str(messagetype),'number':sendid,'msg':'[CQ:face,id=147]'})
-                    elif messagecommand[0:4] == '发送消息':
-                        sendmessageidlist = []
-                        if str(qq) in adminQQ:
-                            if '到' in messagecommand:
-                                if '群' in messagecommand:
-                                    try:
-                                        send_msg({'msg_type':'group','number':int(messagecommand[messagecommand.rfind('到')+1:messagecommand.rfind('群')]),'msg':str(messagecommand[4:messagecommand.rfind('到')])})
-                                    except BaseException as error:
-                                        send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(qq)+"][CQ:face,id=9]呜呜,出错了QAQ："+str(error)+str('\n')+"-------------------"+str('\n')+MintBotVersion})
-                                        print('所有异常的基类：'+str(error))
-                                        continue
-                                elif '人' in messagecommand:
-                                    try:
-                                        send_msg({'msg_type':'private','number':int(messagecommand[messagecommand.rfind('到')+1:messagecommand.rfind('人')]),'msg':str(messagecommand[4:messagecommand.rfind('到')])})
-                                    except BaseException as error:
-                                        send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(qq)+"][CQ:face,id=9]呜呜,出错了QAQ："+str(error)+str('\n')+"-------------------"+str('\n')+MintBotVersion})
-                                        print('所有异常的基类：'+str(error))
-                                        continue
-                                else:
-                                    try:
-                                        send_msg({'msg_type':str(messagetype),'number':sendid,'msg':str(messagecommand[4:len(messagecommand)])})
-                                    except BaseException as error:
-                                        send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(qq)+"][CQ:face,id=9]呜呜,出错了QAQ："+str(error)+str('\n')+"-------------------"+str('\n')+MintBotVersion})
-                                        print('所有异常的基类：'+str(error))
-                                        continue
-                            else:
-                                try:
-                                    send_msg({'msg_type':str(messagetype),'number':sendid,'msg':str(messagecommand[4:len(messagecommand)])})
-                                except BaseException as error:
-                                    send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(qq)+"][CQ:face,id=9]呜呜,出错了QAQ："+str(error)+str('\n')+"-------------------"+str('\n')+MintBotVersion})
-                                    print('所有异常的基类：'+str(error))
-                                    continue
-                        else:
-                            try:
-                                send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(qq)+"]您不是管理员QwQ"}) 
-                            except BaseException as error:
-                                send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(qq)+"][CQ:face,id=9]呜呜,出错了QAQ："+str(error)+str('\n')+"-------------------"+str('\n')+MintBotVersion})
-                                print('所有异常的基类：'+str(error))
-                                continue
                     elif messagecommand[0:1] == '丢' or messagecommand[0:1] == '丟':
                         if messagecommand[1:2] == '我':
                             MoId = qq
@@ -996,6 +1112,8 @@ while True:
                             f.write(Pafile.content)
                         send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:image,file=file:///"+os.getcwd()+"\Paimage."+Pafiletype+"]"})
                     elif messagecommand[0:2] == '摸摸':
+                        #send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(qq)+"][CQ:face,id=9]抱歉，摸摸功能因为API维护而暂时停用QwQ"})
+                        #continue
                         if messagecommand[2:3] == '我':
                             MoId = qq
                         elif 'CQ:at' in messagecommand:
@@ -1007,8 +1125,8 @@ while True:
                         os.chdir(r"C:\\Users\Administrator\.go-cqhttp")
                         MoQQimagegetJson = demjson.decode(requests.get(MoApiQQimageUrl).text)
                         print(MoQQimagegetJson)
-                        #MoApiul = 'http://api.wer.plus:8080/api/ruad?url=' + str(urllib.parse.quote(MoQQimagegetJson.get('imgurl'))) + '&token=' + str(onemingKey)
-                        MoApiul = 'http://101.35.149.229:8080/api/ruad?url=' + str(urllib.parse.quote(MoQQimagegetJson.get('imgurl'))) + '&token=' + str(onemingKey)
+                        MoApiul = 'http://api.wer.plus:8080/api/ruad?url=' + str(urllib.parse.quote(MoQQimagegetJson.get('imgurl'))) + '&token=' + str(onemingKey)
+                        #MoApiul = 'http://101.35.149.229:8080/api/ruad?url=' + str(urllib.parse.quote(MoQQimagegetJson.get('imgurl'))) + '&token=' + str(onemingKey)
                         print(MoApiul)
                         Mofilejsonget = requests.get(MoApiul).text
                         print(Mofilejsonget)
@@ -1020,6 +1138,8 @@ while True:
                             f.write(Mofile.content)
                         send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:image,file=file:///"+os.getcwd()+"\Moimage."+Mofiletype+"]"})
                     elif messagecommand[0:4] == '摸鱼日历':
+                        send_msg({'msg_type':str(messagetype),'number':sendid,'msg':"[CQ:at,qq="+str(qq)+"][CQ:face,id=9]抱歉，摸鱼日历因为不稳定而暂时停用QwQ"})
+                        continue
                         MoYuUrl = 'https://api.vvhan.com/api/moyu?type=json'
                         MoYuJsonGet = requests.get(MoYuUrl).text
                         MoYuJson = demjson.decode(MoYuJsonGet)
@@ -1066,9 +1186,9 @@ while True:
         except KeyboardInterrupt as error:
                    print('用户中断执行(通常是输入^C)：'+str(error))
                    continue
-#        except Exception as error:
-#                   print('常规错误的基类：'+str(error))
-#                   continue
+        except Exception as error:
+                   print('常规错误的基类：'+str(error))
+                   continue
         except StopIteration as error:
                    print('迭代器没有更多的值：'+str(error))
                    continue
@@ -1153,12 +1273,12 @@ while True:
         except SystemError as error:
                    print('一般的解释器系统错误：'+str(error))
                    continue
-#        except TypeError as error:
-#                   print('对类型无效的操作：'+str(error))
-#                   continue
-#        except ValueError as error:
-#                   print('传入无效的参数：'+str(error))
-#                   continue
+        except TypeError as error:
+                   print('对类型无效的操作：'+str(error))
+                   continue
+        except ValueError as error:
+                   print('传入无效的参数：'+str(error))
+                   continue
         except UnicodeError as error:
                    print('Unicode 相关的错误：'+str(error))
                    continue
@@ -1195,9 +1315,9 @@ while True:
         except UserWarning as error:
                    print('用户代码生成的警告：'+str(error))
                    continue
-#        except:
-#                   print('未知错误')
-#                   continue
+        except:
+                   print('未知错误')
+                   continue
         else:
             continue
     elif rev["post_type"]=="meta_event":
