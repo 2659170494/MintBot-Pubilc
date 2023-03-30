@@ -6,6 +6,7 @@ import requests
 import random
 import urllib
 import time
+#出于纪念就不覆盖了awa
 import os
 import filetype
 import demjson
