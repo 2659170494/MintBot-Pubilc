@@ -1,6 +1,6 @@
 # MintBot
 
-###也快一周年了，是时候更换到nonebot版本了(V2版本开发中)
+### 也快一周年了，是时候更换到nonebot版本了(V2版本开发中)
 那么久没更新主要是写的代码太乱太杂了，且涉及到太多的隐私信息，加上去年的中考几乎没时间维护，不过私底下还在维护就是啦awa
 但如果有问题请一定在issue提出来让我知道xwx
 本代码因网络问题无法连接至Github(" https://github.com/2659170494/MintBot ")默认在Gitee(" https://gitee.com/GreenYoshi/MintBot ")更新,Github(" https://github.com/2659170494/MintBot ")上的代码能否更新完全看运气!!!
