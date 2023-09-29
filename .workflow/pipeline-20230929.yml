@@ -1,0 +1,31 @@
+version: '1.0'
+name: pipeline-20230929
+displayName: pipeline-20230929
+triggers:
+  trigger: auto
+  push:
+    branches:
+      prefix:
+        - ''
+stages:
+  - name: stage-2a744304
+    displayName: 未命名
+    strategy: naturally
+    trigger: auto
+    executor: []
+    steps:
+      - step: ut@python
+        name: unit_test_python
+        displayName: Python 单元测试
+        pythonVersion: '3.9'
+        commands:
+          - '# Python单元测试默认命令'
+          - pytest --html=report/index.html
+        report:
+          path: report
+          index: index.html
+        checkpoints: []
+        caches: []
+        notify: []
+        strategy:
+          retry: '0'
