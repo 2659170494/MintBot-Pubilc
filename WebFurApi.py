@@ -240,6 +240,72 @@ def tuyaV3find_img_new(appid,appkey,name,json_enabled):
     #if findover != 2:
         #tuyatokentmp.close()
         #return json.dumps({"status":501,"tokenjson":tuyatokenjson,"apierror":str(findfriendrequests.text)})
+
+def findluoV4tantan_token(token,name):
+    #新的开始！
+    findluo_url = "https://findluo-api.turka.cn/tantan/"
+    findluo_header = {"Authorization": token}
+    findluo_respone = requests.get(findluo_url+str(name),headers=findluo_header)
+    findluo_json = json.loads(findluo_respone.text)
+    return findluo_json
+    
+def findluoV4tantan(appid,apikey,name):
+    #新的开始！
+    findluo_url = "https://findluo-api.turka.cn/tantan/"+str(name)
+    findluo_sign = findluoV4sign(appid,apikey,findluo_url,False)
+    findluo_header = {"Authorization": "Findluo "+appid+"-"+findluo_sign["signhex"]+"-"+findluo_sign["timestamp"]}
+    findluo_respone = requests.get(findluo_url,headers=findluo_header)
+    findluo_json = json.loads(findluo_respone.text)
+    return findluo_json    
+
+def findluoV4sign(appid,apikey,findluo_url,debug):
+    #v4正式版的签名！
+    now_timestamp = int(time.time() * 1000)
+    findluo_signstr = "Findluo\n" + str(now_timestamp) + "\n" + str(urlparse.urlparse(findluo_url).path) + "\n" + str(apikey)
+    findluo_signhex = hashlib.sha256(findluo_signstr.encode('utf-8')).hexdigest()
+    if debug == True:
+        print({"Appid": appid, "signstr": findluo_signstr,"signhex": findluo_signhex,"timestamp": str(now_timestamp)})
+    return {"Appid": appid, "signstr": findluo_signstr,"signhex": findluo_signhex,"timestamp": str(now_timestamp)}
+
+def findluo2tuyafind(luojson):
+    #findluo与tuyafind的数据结构相似，通常情况下推荐使用新结构即可。
+    #本函数只补全和还原（合并）成TuYaFind数据结构
+    if luojson == type("str"):
+        luojson = json.loads(luojson)
+    tuyajson = {"code":0,"msg":"嘿嘿，找找找到啦！OwO","data":{"name":"yoshi","id":"114514","birthday":"1990-11-21","hometown":"Yoshi Land","animal":"dragon and turtle","cha":"uwu","likes":"IT","intro":"你好！这里是绿色耀西哇awa"}}
+    tuyajson["code"] = luojson['code']
+    tuyajson["status"] = luojson['status']
+    tuyajson['msg'] = luojson['message']
+    if "data" in luojson:
+        #tuyajson['data'] = luojson['data']
+        tuyajson['data']["name"] = luojson['data']['name']
+        tuyajson['data']["id"] = luojson['data']['id']
+        tuyajson['data']["birthday"] = luojson['data']["birthday"]
+        tuyajson['data']["hometown"] = luojson['data']["hometown"]
+        tuyajson['data']["animal"] = luojson['data']["animal"]
+        if "cha" in luojson:
+            tuyajson['data']["cha"] = luojson['data']["cha"]
+        else:
+            tuyajson['data']["cha"] = "呜，暂时不知道唔xwx"
+        if "likes" in luojson:
+            tuyajson['data']["likes"] = luojson['data']["likes"]
+        else:
+            tuyajson['data']["likes"] = "呜，暂时不知道唔xwx"
+        if "intro" in luojson:
+            tuyajson['data']["intro"] = luojson['data']["intro"]
+        else:
+            tuyajson['data']["intro"] = "呜，暂时不知道唔xwx"
+        tuyajson['data']["gender"] = luojson['data']['gender']
+        tuyajson['data']['keywords'] = luojson['data']['keywords']
+        if 'state' in luojson:
+            tuyajson['data']['state'] = luojson['data']['state']
+        else:
+            tuyajson['data']['state'] = 404
+        if "uid" in luojson:
+            tuyajson['data']['uid'] = luojson['data']['uid']
+        else:
+            tuyajson['data']["uid"] = 404
+    return tuyajson
 def microtailV1random():
     microtailurl = 'https://api.tail.icu/'
     microtailurl = microtailurl+'api/v1/getFursuit/json'
